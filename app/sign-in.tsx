@@ -45,7 +45,10 @@ export default function SignIn() {
             return;
         }
 
-        signIn(JSON.stringify(data.session?.access_token));
+        signIn(JSON.stringify({
+            token: data.session?.access_token,
+            user_id: data.user?.id
+        }));
         return router.replace("/");
     }
 

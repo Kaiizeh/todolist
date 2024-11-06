@@ -3,9 +3,9 @@ import {ChevronRight} from "@tamagui/lucide-icons";
 import {STATUS} from "../fixtures/todolist-fixture";
 
 export default function TodolistCard({title, items, navigate}) {
-    const pending = items.filter(item => item.completed === STATUS.pending).length;
-    const completed = items.filter(item => item.completed === STATUS.completed).length;
-    const waiting = items.filter(item => item.completed === STATUS.waiting).length;
+    const pending = 0//items.filter(item => item.completed === STATUS.pending).length;
+    const completed = 0//items.filter(item => item.completed === STATUS.completed).length;
+    const waiting = 0//items.filter(item => item.completed === STATUS.waiting).length;
     return (
         <XStack
             w="100%"
