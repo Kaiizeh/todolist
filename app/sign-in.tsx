@@ -1,11 +1,13 @@
-import {Button, Input, Label, Spinner, XStack, YStack} from "tamagui";
+import {Button, Spinner, View, YStack} from "tamagui";
 import {useState} from "react";
-import {supabase} from "../../utils/database";
-import {Loader} from "@tamagui/lucide-icons";
-import { z } from "zod";
-import FormInput from "../../components/FormInput";
+import {supabase} from "../utils/database";
+import {Link, router} from "expo-router";
+import {z} from "zod";
+import FormInput from "../components/FormInput";
+import {useSession} from "../ctx";
 
-export default function SignUp() {
+export default function SignIn() {
+    const { signIn } = useSession()
     const [formData, setFormData] = useState({
         email: "",
         password: ""
@@ -24,33 +26,34 @@ export default function SignUp() {
 
     const handleSubmit = async () => {
         setIsLoading(true);
-        console.log(formData)
-        const {success, error: zError} = credentialSchema.safeParse(formData);
+        const {error: zError} = credentialSchema.safeParse(formData);
 
         if(zError) {
             const errorFormat = {};
             zError.errors.forEach(tError => {
-                    errorFormat[tError.path[0]] = tError.message
-                })
+                errorFormat[tError.path[0]] = tError.message
+            })
             setZodError(errorFormat);
             setIsLoading(false);
-           return;
+            return;
         }
 
-        const {data, error} = await supabase.auth.signUp(formData)
-
+        const {data, error} = await supabase.auth.signInWithPassword(formData);
+        setIsLoading(false);
         if(error) {
             console.log(error);
+            return;
         }
 
-        setIsLoading(false);
+        signIn(JSON.stringify(data.session?.access_token));
+        return router.replace("/");
     }
 
     return (
-        <XStack fullscreen backgroundColor="$background" justifyContent="center" alignItems="center">
-            <YStack borderColor="#BABABA" borderWidth={1} width="80%" padding="$4" borderRadius="$2" gap="$4">
+        <YStack fullscreen paddingHorizontal="$4" backgroundColor="$background">
+            <YStack width="100%" gap="$4">
                 <FormInput placeholder={"email..."}
-                    label={"Adresse mail"}
+                           label={"Adresse mail"}
                            value={formData.email}
                            onChange={(e) => handleEntry('email', e)}
                            errorMessage={zodError?.email}
@@ -70,11 +73,16 @@ export default function SignUp() {
                         isLoading ?
                             <Spinner />
                             :
-                            'Créer mon compte'
+                            'Se connecter'
                     }
 
                 </Button>
+                <View width="100%" alignItems="center" display="flex">
+                    <Link href="/sign-up">Je n'ai pas de compte</Link>
+                </View>
+
+
             </YStack>
-        </XStack>
+        </YStack>
     )
 }
